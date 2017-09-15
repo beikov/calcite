@@ -27,6 +27,7 @@ branches:
     - javadoc
     - /^branch-.*$/
     - /^[0-9]+-.*$/
+    - travis-test
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
