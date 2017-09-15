@@ -38,8 +38,8 @@ cache:
 matrix:
   fast_finish: true
   include:
-    - env: JDK=7
-      jdk: openjdk7
+#    - env: JDK=7
+#      jdk: openjdk7
     - env: JDK=8
       jdk: oraclejdk8
 # End .travis.yml
