@@ -29,9 +29,9 @@ branches:
     - /^[0-9]+-.*$/
     - travis-test
 install:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -B -V
 script:
-  - mvn -Dsurefire.useFile=false test
+  - mvn -Dsurefire.useFile=false -Dcheckstyle.skip=true test
 git:
   depth: 10000
 sudo: false
