@@ -28,7 +28,7 @@ branches:
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -B -V
 script:
-  - travis_wait mvn -Dsurefire.useFile=false -Dcheckstyle.skip=true test
+  - "bash ./travis/build.sh"
 git:
   depth: 10000
 sudo: false
