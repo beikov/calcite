@@ -17,10 +17,6 @@
 # limitations under the License.
 #
 language: java
-# Leave out jdk switch because on the legacy infrastructure this won't work
-# No big deal because oraclejdk7 is the default anyways
-#jdk:
-#  - oraclejdk7
 branches:
   only:
     - master
@@ -43,6 +39,7 @@ matrix:
   fast_finish: true
   include:
     - env: JDK=7
+      jdk: openjdk7
     - env: JDK=8
       jdk: oraclejdk8
 # End .travis.yml
