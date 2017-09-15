@@ -156,7 +156,7 @@ import org.junit.runners.Suite;
     CalciteSqlOperatorTest.class,
     LatticeTest.class,
     ReflectiveSchemaTest.class,
-    JdbcTest.class,
+//    JdbcTest.class,
     QuidemTest.class,
     CalciteRemoteDriverTest.class,
     StreamTest.class,
