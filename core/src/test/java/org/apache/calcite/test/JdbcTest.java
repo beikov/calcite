@@ -102,6 +102,7 @@ import com.google.common.collect.Multimap;
 
 import org.hsqldb.jdbcDriver;
 
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -163,7 +164,8 @@ import static org.junit.Assert.fail;
  */
 public class JdbcTest {
 
-  static {
+  @BeforeClass
+  static void init() {
     System.out.println("Running JdbcTest");
     System.out.flush();
   }
