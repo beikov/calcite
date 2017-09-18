@@ -163,6 +163,11 @@ import static org.junit.Assert.fail;
  */
 public class JdbcTest {
 
+  static {
+    System.out.println("Running JdbcTest");
+    System.out.flush();
+  }
+
   public static final String FOODMART_SCHEMA = "     {\n"
       + "       type: 'jdbc',\n"
       + "       name: 'foodmart',\n"

@@ -29,6 +29,7 @@ install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -B -V
 script:
   - "bash ./travis/build.sh"
+#  - mvn -Dsurefire.useFile=false -Dcheckstyle.skip=true test
 git:
   depth: 10000
 sudo: false
