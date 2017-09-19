@@ -62,10 +62,6 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class QuidemTest {
 
-  static {
-    System.out.println("Running QuidemTest");
-    System.out.flush();
-  }
   private final String path;
   private final Method method;
 
@@ -101,8 +97,6 @@ public class QuidemTest {
   /** For {@link org.junit.runners.Parameterized} runner. */
   @Parameterized.Parameters(name = "{index}: quidem({0})")
   public static Collection<Object[]> data() {
-    System.out.println("Determining iq files for QuidemTest...");
-    System.out.flush();
     // Start with a test file we know exists, then find the directory and list
     // its files.
     final String first = "sql/agg.iq";
@@ -124,8 +118,6 @@ public class QuidemTest {
           : "f: " + f.getAbsolutePath() + "; base: " + base;
       paths.add(f.getAbsolutePath().substring(base.length()));
     }
-    System.out.println("Determined file: " + paths);
-    System.out.flush();
     return Lists.transform(paths, new Function<String, Object[]>() {
       public Object[] apply(String path) {
         return new Object[] {path};
