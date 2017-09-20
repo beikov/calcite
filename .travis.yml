@@ -25,7 +25,7 @@ branches:
     - /^branch-.*$/
     - /^[0-9]+-.*$/
     - travis-test
-#install:
+install: true
 #  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -B -V
 script:
   - "bash ./travis/build.sh"
