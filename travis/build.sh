@@ -5,6 +5,8 @@
 #cd -
 #mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -B -V
 #mvn -nsu -Dsurefire.useFile=false -Dcheckstyle.skip=true test
+unset JAVA_OPTIONS
+unset _JAVA_OPTIONS
 mvn -Dsurefire.useFile=false -Dcheckstyle.skip=true test
 
 
