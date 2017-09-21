@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-git clone https://github.com/beikov/maven-surefire.git
-cd maven-surefire
-mvn -DskipTests install
-cd -
+#git clone https://github.com/beikov/maven-surefire.git
+#cd maven-surefire
+#mvn -DskipTests install
+#cd -
 #mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -B -V
-mvn -nsu -Dsurefire.useFile=false -Dcheckstyle.skip=true test
+#mvn -nsu -Dsurefire.useFile=false -Dcheckstyle.skip=true test
+mvn -Dsurefire.useFile=false -Dcheckstyle.skip=true test
 
 
 #pid=$!
