@@ -813,7 +813,7 @@ limitations under the License.
               </systemProperty>
             </systemProperties>
             <!--<argLine>-Xmx1536m -XX:MaxPermSize=256m -Duser.timezone=${user.timezone} -Duser.country=${user.country} -Duser.language=${user.language}</argLine>-->
-            <argLine>-Xmx1536m -XX:MaxPermSize=256m</argLine>
+            <argLine>-Xmx1536m -XX:MetaspaceSize==256m</argLine>
           </configuration>
         </plugin>
         <plugin>
