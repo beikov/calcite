@@ -800,7 +800,7 @@ limitations under the License.
           <configuration>
             <threadCount>1</threadCount>
             <perCoreThreadCount>true</perCoreThreadCount>
-            <parallel>both</parallel>
+            <!--<parallel>both</parallel>-->
             <forkMode>once</forkMode>
             <systemProperties>
               <systemProperty>
