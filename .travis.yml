@@ -32,7 +32,7 @@ script:
 #  - mvn -Dsurefire.useFile=false -Dcheckstyle.skip=true test
 git:
   depth: 10000
-sudo: false
+sudo: true
 cache:
   directories:
     - $HOME/.m2
