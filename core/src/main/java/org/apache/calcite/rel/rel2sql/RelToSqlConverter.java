@@ -76,6 +76,8 @@ import org.apache.calcite.sql.fun.SqlRowOperator;
 import org.apache.calcite.sql.fun.SqlSingleValueAggFunction;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import org.apache.calcite.sql.util.SqlShuttle;
+import org.apache.calcite.sql.util.SqlVisitor;
 import org.apache.calcite.sql.validate.SqlValidatorUtil;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.Pair;
@@ -145,8 +147,84 @@ public class RelToSqlConverter extends SqlImplementor
     throw new AssertionError("Need to implement " + e.getClass().getName());
   }
 
+  private static class AliasReplacementShuttle extends SqlShuttle {
+    private final String tableAlias;
+    private final RelDataType tableType;
+    private final SqlNodeList replaceSource;
+
+    public AliasReplacementShuttle(String tableAlias, RelDataType tableType, SqlNodeList replaceSource) {
+      this.tableAlias = tableAlias;
+      this.tableType = tableType;
+      this.replaceSource = replaceSource;
+    }
+
+    @Override public SqlNode visit(SqlIdentifier id) {
+      if (id.names.get(0).equals(tableAlias)) {
+        int index = tableType.getField(id.names.get(1), false, false).getIndex();
+        return replaceSource.get(index).clone(id.getParserPosition());
+      }
+      return id;
+    }
+  }
+
   /** @see #dispatch */
   public Result visit(Join e) {
+    if (e.getJoinType() == JoinRelType.ANTI || e.getJoinType() == JoinRelType.SEMI) {
+      final Result leftResult = visitChild(0, e.getLeft()).resetAlias();
+      final Result rightResult = visitChild(1, e.getRight()).resetAlias();
+      final Context leftContext = leftResult.qualifiedContext();
+      final Context rightContext = rightResult.qualifiedContext();
+      SqlNode sqlCondition = null;
+      SqlLiteral condType = JoinConditionType.ON.symbol(POS);
+
+      SqlSelect sqlSelect = leftResult.asSelect();
+      sqlCondition = convertConditionToSqlNode(e.getCondition(),
+          leftContext,
+          rightContext,
+          e.getLeft().getRowType().getFieldCount(),
+          dialect);
+      SqlVisitor<SqlNode> visitor = new AliasReplacementShuttle(leftResult.neededAlias,
+          e.getLeft().getRowType(), sqlSelect.getSelectList());
+      sqlCondition = sqlCondition.accept(visitor);
+      SqlNode fromPart = rightResult.asFrom();
+      SqlSelect existsSqlSelect;
+      if (fromPart.getKind() == SqlKind.SELECT) {
+        existsSqlSelect = (SqlSelect) fromPart;
+        existsSqlSelect.setSelectList(
+            new SqlNodeList(ImmutableList.of(SqlLiteral.createExactNumeric("1", POS)), POS));
+        if (existsSqlSelect.getWhere() != null) {
+          sqlCondition = SqlStdOperatorTable.AND.createCall(POS,
+              existsSqlSelect.getWhere(),
+              sqlCondition);
+        }
+        existsSqlSelect.setWhere(sqlCondition);
+      } else {
+        existsSqlSelect =
+            new SqlSelect(POS, null,
+                new SqlNodeList(
+                    ImmutableList.of(SqlLiteral.createExactNumeric("1", POS)), POS),
+                fromPart, sqlCondition, null,
+                null, null, null, null, null, null);
+      }
+      sqlCondition = SqlStdOperatorTable.EXISTS.createCall(POS, existsSqlSelect);
+      if (e.getJoinType() == JoinRelType.ANTI) {
+        sqlCondition = SqlStdOperatorTable.NOT.createCall(POS, sqlCondition);
+      }
+      if (sqlSelect.getWhere() != null) {
+        sqlCondition = SqlStdOperatorTable.AND.createCall(POS,
+            sqlSelect.getWhere(),
+            sqlCondition);
+      }
+      sqlSelect.setWhere(sqlCondition);
+      SqlNode resultNode;
+      if (leftResult.neededAlias != null) {
+        resultNode = SqlStdOperatorTable.AS.createCall(
+            new SqlNodeList(ImmutableList.of(sqlSelect, new SqlIdentifier(leftResult.neededAlias, POS)), POS));
+      } else {
+        resultNode = sqlSelect;
+      }
+      return result(resultNode, leftResult, rightResult);
+    }
     final Result leftResult = visitChild(0, e.getLeft()).resetAlias();
     final Result rightResult = visitChild(1, e.getRight()).resetAlias();
     final Context leftContext = leftResult.qualifiedContext();
