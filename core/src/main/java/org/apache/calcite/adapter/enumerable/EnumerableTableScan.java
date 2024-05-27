@@ -23,6 +23,7 @@ import org.apache.calcite.linq4j.Enumerable;
 import org.apache.calcite.linq4j.Queryable;
 import org.apache.calcite.linq4j.function.Function1;
 import org.apache.calcite.linq4j.tree.Blocks;
+import org.apache.calcite.linq4j.tree.ConstantUntypedNull;
 import org.apache.calcite.linq4j.tree.Expression;
 import org.apache.calcite.linq4j.tree.Expressions;
 import org.apache.calcite.linq4j.tree.MethodCallExpression;
@@ -277,11 +278,15 @@ public class EnumerableTableScan
         final JavaTypeFactory typeFactory =
                 (JavaTypeFactory) getCluster().getTypeFactory();
         final PhysType elementPhysType =
-            PhysTypeImpl.of(typeFactory, fieldType, JavaRowFormat.CUSTOM);
+            PhysTypeImpl.of(typeFactory, fieldType, JavaRowFormat.ARRAY);
+        final Expression e1 =
+            Expressions.convert_(e, Iterable.class);
         final MethodCallExpression e2 =
-            Expressions.call(BuiltInMethod.AS_ENUMERABLE2.method, e);
+            Expressions.call(BuiltInMethod.AS_ENUMERABLE2.method, e1);
         final Expression e3 = elementPhysType.convertTo(e2, JavaRowFormat.LIST);
-        return Expressions.call(e3, BuiltInMethod.ENUMERABLE_TO_LIST.method);
+        return Expressions.condition(
+            Expressions.equal( e, ConstantUntypedNull.INSTANCE ), ConstantUntypedNull.INSTANCE,
+            Expressions.call(e3, BuiltInMethod.ENUMERABLE_TO_LIST.method) );
       } else {
         return e;
       }
